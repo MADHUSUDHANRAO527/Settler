@@ -1,0 +1,96 @@
+<resources>
+    <string name="app_name">Settler</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="book_a_service">Book a service</string>
+    <string name="all_services">All services</string>
+    <string name="bookikng_history">Booking History</string>
+    <string name="wallet">Wallet</string>
+    <string name="offers">Offers</string>
+    <string name="notifications">Notifications</string>
+    <string name="support">Support</string>
+    <string name="share_and_earn">Share and Earn</string>
+    <string name="my_account">My Account</string>
+
+    <string name="tap_exit">Please Tap BACK again to exit"</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">Login</string>
+    <string name="mobile_num_email">Mobile No. / Email id</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="dont_have_account">Dont have an account?</string>
+    <string name="sign_in_with">SIGN IN with</string>
+
+    <!--network messages-->
+    <string name="server_not_reachable">Server not reachable</string>
+    <string name="certificate_unavailable">Certificate Exception : You may have to install the certificate.</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="service_unavailable">Please wait, service is currently unavailable</string>
+    <string name="unimplemented">The request is not implemented by the server.</string>
+    <string name="internal_server_error">Internal Server Error. Please retry.</string>
+    <string name="bad_request">Invalid Syntax.</string>
+    <string name="no_resource">Resource not found.</string>
+    <string name="json_error">JSON parsing error</string>
+    <string name="invalid_sign_in">Username and password don’t match.
+        Please try again.</string>
+    <string name="bad_gateway">Bad Gateway</string>
+    <string name="internet_connection">Please check your network connection!</string>
+    <string name="service_location">SERVICE LOCATION</string>
+    <string name="signup">SIGN UP</string>
+    <string name="first_name">First Name</string>
+    <string name="mobile_num">Mobile No.</string>
+    <string name="mobile_email">Email id</string>
+    <string name="create_account">Create Account</string>
+    <string name="already_have_acc">Already have an account? SIGN IN</string>
+    <string name="or">OR</string>
+    <string name="termsandcondi">By signing up,you agree to our</string>
+    <string name="termsconditions"><u><![CDATA[Terms & Conditions and privacy policy]]></u></string>
+    <string name="enter_proper_email_ph">Please enter proper email or phone number!</string>
+    <string name="enter_proper_password">Please enter proper password!</string>
+
+
+    <string name="enter_proper_firstname">Please enter firstname!</string>
+    <string name="enter_proper_lastname">Please enter lastname!</string>
+    <string name="enter_proper_mblenum">Please enter proper mobile number!</string>
+    <string name="enter_proper_email">Please enter proper email!</string>
+
+    <string name="done">Done</string>
+    <string name="last_name">Last Name</string>
+    <string name="next">Next</string>
+    <string name="proceed">Proceed</string>
+    <string name="select_loc_manually">Not able to fetch your location!Pls click here to select your location manually!</string>
+    <string name="confirm_booking">Confirm Booking</string>
+    <string name="service_provider_details_can_be_found_in_booking_histoty">Service Provider details can be found in Booking History</string>
+    <string name="home">Home</string>
+    <string name="your_booking_is_confirmed">Your booking is confirmed</string>
+    <string name="submit">Submit</string>
+    <string name="request_cancelled">Request has been cancelled</string>
+    <string name="are_you_sure_cancel_request">Are you sure you want to cancel this request?</string>
+    <string name="rate_this_service">Rate this service</string>
+    <string name="pls_select_date">Please select date!</string>
+    <string name="pls_select_time">Please select time!</string>
+    <string name="select_one_option">Select atleast one option!</string>
+    <string name="pls_select_sp">Select atleast one service provider!</string>
+    <string name="your_not_loggedin">You are not logged In? Please signIn</string>
+    <string name="ur_booking_canceled">Your booking has been cancelled!</string>
+    <string name="select_proper_date">Select Proper Date!</string>
+    <string name="select_date">Select Date</string>
+    <string-array name="nav_drawer_labels">
+        <item>@string/home</item>
+        <item>@string/bookikng_history</item>
+        <item>@string/wallet</item>
+        <item>@string/offers</item>
+        <item>@string/notifications</item>
+        <item>@string/support</item>
+        <item>@string/share_and_earn</item>
+    </string-array>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="enter_comment">Please enter comment!</string>
+    <string name="enter_rating">Give some rating!</string>
+</resources>
