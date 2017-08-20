@@ -1,17 +1,27 @@
 package app.mobile.settler.utilities;
 
+import java.util.ArrayList;
+
+import app.mobile.settler.models.MapStoresModel;
+
 /**
  * Created by madhu on 28/6/17.
  */
 
-public class NServicesSingleton {
-    private static final NServicesSingleton instance = new NServicesSingleton();
+public class SettlerSingleton {
+    private static final SettlerSingleton instance = new SettlerSingleton();
     private String myCurrentAddress;
     private Double mycurrentLatitude;
     private Double mycurrentLongitude;
-    private String setuserSelectedAddress;
-    private String selectedServiceName;
-    private String userSelectedDate;
+    private ArrayList<MapStoresModel> cartModelList;
+
+    public ArrayList<MapStoresModel> getCartModelList() {
+        return cartModelList;
+    }
+
+    public void setCartModelList(ArrayList<MapStoresModel> cartModelList) {
+        this.cartModelList = cartModelList;
+    }
 
     public String getUserSelectedTime() {
         return userSelectedTime;
@@ -23,28 +33,11 @@ public class NServicesSingleton {
 
     private String userSelectedTime;
 
-    public String getUserSelectedDate() {
-        return userSelectedDate;
-    }
-
-    public void setUserSelectedDate(String userSelectedDate) {
-        this.userSelectedDate = userSelectedDate;
-    }
-
-    public String getSelectedServiceName() {
-        return selectedServiceName;
-    }
-
-    public void setSelectedServiceName(String selectedServiceName) {
-        this.selectedServiceName = selectedServiceName;
-    }
-
-
 
     private Double setUserSelectedLatitude;
 
 
-    public static NServicesSingleton getInstance() {
+    public static SettlerSingleton getInstance() {
         return instance;
     }
 
@@ -70,14 +63,6 @@ public class NServicesSingleton {
 
     public void setMycurrentLongitude(Double mycurrentLongitude) {
         this.mycurrentLongitude = mycurrentLongitude;
-    }
-
-    public String getSetuserSelectedAddress() {
-        return setuserSelectedAddress;
-    }
-
-    public void setSetuserSelectedAddress(String setuserSelectedAddress) {
-        this.setuserSelectedAddress = setuserSelectedAddress;
     }
 
     public Double getSetUserSelectedLatitude() {

@@ -93,4 +93,5 @@
     <string name="drawer_close">Close</string>
     <string name="enter_comment">Please enter comment!</string>
     <string name="enter_rating">Give some rating!</string>
+    <string name="offer_add_to_cart">Offer saved to Basket</string>
 </resources>

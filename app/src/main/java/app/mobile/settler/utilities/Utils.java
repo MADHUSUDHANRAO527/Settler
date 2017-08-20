@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.LocationManager;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -42,8 +43,8 @@ public class Utils {
     }
 
     public static Bitmap setMarkerSize(Context mContext) {
-        int height = 95;
-        int width = 95;
+        int height = 295;
+        int width = 295;
         BitmapDrawable bitmapdraw = (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.marker);
         Bitmap b = bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, width, height, false);
@@ -98,6 +99,15 @@ public class Utils {
             return true;
         }
         return false;
+    }
+    public static boolean isGPSEnabled(Context mContext) {
+        final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //buildAlertMessageNoGps(mContext);
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

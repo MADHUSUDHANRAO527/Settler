@@ -22,38 +22,37 @@ import app.mobile.settler.utilities.UImsgs;
  * Created by madhu on 21/6/17.
  */
 
-public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapter.ServicesViewHolder> {
+public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHolder> {
     private Context mContext;
-    public ArrayList<MapStoresModel> mapsStoreModel;
+    private ArrayList<MapStoresModel> cartModelList;
     private UImsgs uImsgs;
 
-    public ServicesListAdapter(Context context, ArrayList<MapStoresModel> model) {
-        this.mapsStoreModel = model;
+    public CartAdapter(Context context, ArrayList<MapStoresModel> model) {
+        this.cartModelList = model;
         this.mContext = context;
         uImsgs = new UImsgs(context);
     }
 
     @Override
     public ServicesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.services_row, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.cart_row, parent, false);
         return new ServicesViewHolder(itemView);
     }
 
     @Override
     public void onBindViewHolder(ServicesViewHolder holder, final int position) {
-        holder.storeTitleTxt.setText(mapsStoreModel.get(position).getStorName());
-        holder.prodcutNameTxt.setText(mapsStoreModel.get(position).getProductName());
-        holder.offerTxt.setText(mapsStoreModel.get(position).getOfferName());
-        //holder.statusTxt.setText(mapsStoreModel.get(position).getStorName());
+        holder.offerTxt.setText(cartModelList.get(position).getProductName());
+        holder.offerNameTxt.setText(cartModelList.get(position).getOfferName());
+        holder.expireTxt.setText(cartModelList.get(position).getActiveHours());
 
-        Glide.with(mContext).load(mapsStoreModel.get(position).getImageUrl())
+        Glide.with(mContext).load(cartModelList.get(position).getImageUrl())
                 .into(holder.servicesIcon);
        /* holder.historyRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(mContext, HistoryActiveDetailActivity.class);
-                Log.d("booking_id", mapsStoreModel.get(position).getId());
-                i.putExtra("booking_id", mapsStoreModel.get(position).getId());
+                Log.d("booking_id", cartModelList.get(position).getId());
+                i.putExtra("booking_id", cartModelList.get(position).getId());
                 
                 mContext.startActivity(i);
             }
@@ -62,19 +61,19 @@ public class ServicesListAdapter extends RecyclerView.Adapter<ServicesListAdapte
 
     @Override
     public int getItemCount() {
-        return mapsStoreModel.size();
+        return cartModelList.size();
     }
 
     public class ServicesViewHolder extends RecyclerView.ViewHolder {
-        public TextView storeTitleTxt, prodcutNameTxt, offerTxt;
+        public TextView offerTxt, offerNameTxt, expireTxt;
         public ImageView servicesIcon;
         public RelativeLayout historyRow;
 
         public ServicesViewHolder(View itemView) {
             super(itemView);
-           // storeTitleTxt = (TextView) itemView.findViewById(R.id.store_txt);
-           // prodcutNameTxt = (TextView) itemView.findViewById(R.id.product_name_txt);
+            expireTxt = (TextView) itemView.findViewById(R.id.active_hrs);
             offerTxt = (TextView) itemView.findViewById(R.id.offer_txt);
+            offerNameTxt = (TextView) itemView.findViewById(R.id.offer_name_txt);
             servicesIcon = (ImageView) itemView.findViewById(R.id.services_icon);
             historyRow = (RelativeLayout) itemView.findViewById(R.id.history_row);
         }

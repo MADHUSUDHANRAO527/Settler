@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import app.mobile.settler.R;
 import app.mobile.settler.models.MapStoresModel;
@@ -23,14 +22,12 @@ import app.mobile.settler.models.MapStoresModel;
 
 public class SwipeDeckAdapter extends BaseAdapter {
 
-    private List<String> data;
     private Context context;
     LayoutInflater inflator;
     public ArrayList<MapStoresModel> mapsStoreModel;
 
     public SwipeDeckAdapter(ArrayList<MapStoresModel> mapStoreModel
             , Context context) {
-        this.data = data;
         this.context = context;
         mapsStoreModel = mapStoreModel;
         inflator = (LayoutInflater) context
@@ -40,12 +37,12 @@ public class SwipeDeckAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return data.size();
+        return mapsStoreModel.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return data.get(position);
+        return mapsStoreModel.get(position);
     }
 
     @Override
