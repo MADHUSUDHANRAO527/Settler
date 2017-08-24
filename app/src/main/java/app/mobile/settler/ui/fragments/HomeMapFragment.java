@@ -1,38 +1,24 @@
 package app.mobile.settler.ui.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
-import android.provider.Settings;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.daprlabs.cardstack.SwipeDeck;
 import com.google.android.gms.maps.CameraUpdate;
@@ -66,14 +52,11 @@ import app.mobile.settler.models.MapStoresModel;
 import app.mobile.settler.netwrokHelpers.VolleyHelper;
 import app.mobile.settler.services.CurrentLocationService;
 import app.mobile.settler.services.LocationAddress;
-import app.mobile.settler.ui.activity.BaseActivity;
-import app.mobile.settler.ui.adapters.SwipeDeckAdapter;
 import app.mobile.settler.utilities.PreferenceManager;
 import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
 import app.mobile.settler.utilities.Utils;
 
-import static android.content.Context.MODE_PRIVATE;
 import static app.mobile.settler.R.id.map;
 
 
@@ -81,7 +64,6 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
     private static final String TAG = "Settler-MapActivity.class";
     // private GoogleMap googleMapInstance;
     private TextView addressTxt, cartNumTxt;
-    ImageView serviceListIcon, mapIcon, cartIcon;
     String locationAddress;
     private PreferenceManager preferenceManager;
     private Context mContext;
@@ -95,94 +77,14 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
     private static final int ACCESS_FINE_LOCATION_PERMISSION_CONSTANT = 100;
     private static final int REQUEST_PERMISSION_SETTING = 101;
     private boolean sentToSettings = false;
-    private boolean locationPermission;
     double latitude, longitude;
     ProgressBar progressBar;
     SupportMapFragment mapFragment;
     private GoogleMap googleMapInstance;
     SwipeDeck cardStack;
-    TextView noMoreCardsTxt;
     FragmentHomeMapBinding homeMapBinding;
-    ArrayList<MapStoresModel> cartModelList = new ArrayList<>();
     public ArrayList<MapStoresModel> mapsStoreModel = new ArrayList<>();
 
-    private void checkForPermissions() {
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
-                //if user deny's //Show Information about why you need the permission
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Need location Permission");
-                builder.setMessage("This app needs location permission.");
-                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_PERMISSION_CONSTANT);
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        locationPermission = true;
-                        dismisPbar();
-                        addressTxt.setTextSize(12);
-                        //   addressTxt.setSingleLine(false);
-                        addressTxt.setLines(2);
-                        addressTxt.setText("You are denied location permission!" + System.getProperty("line.separator") + "Click here to goto settings page!");
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
-            } else if (permissionStatus.getBoolean(Manifest.permission.ACCESS_FINE_LOCATION, false)) {
-                //Previously Permission Request was cancelled with 'Dont Ask Again',
-                // Redirect to Settings after showing Information about why you need the permission
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Need location Permission");
-                builder.setMessage("This app needs locaiton permission.");
-                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        sentToSettings = true;
-                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        Uri uri = Uri.fromParts("package", mContext.getPackageName(), null);
-                        intent.setData(uri);
-
-                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-                        Toast.makeText(mContext, "Go to Permissions to Grant locaiton!", Toast.LENGTH_LONG).show();
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
-            } else {
-                //just request the permission
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, ACCESS_FINE_LOCATION_PERMISSION_CONSTANT);
-            }
-            SharedPreferences.Editor editor = permissionStatus.edit();
-            editor.putBoolean(Manifest.permission.ACCESS_FINE_LOCATION, true);
-            editor.apply();
-        } else {
-            //You already have the permission, just go ahead.
-            if (preferenceManager.getString("user_location") != null && !preferenceManager.getString("user_location").equals("")) {
-                addressTxt.setText(preferenceManager.getString("user_location"));
-
-                if (preferenceManager.getString("user_lat") != null) {
-                    userLati = preferenceManager.getString("user_lat");
-                    userLongi = preferenceManager.getString("user_long");
-                }
-                // locateUserAddress(Double.parseDouble(userLati), Double.parseDouble(userLongi));
-                dismisPbar();
-            } else {
-                getLocation();
-            }
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -194,104 +96,18 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         StrictMode.setThreadPolicy(policy);
         volleyHelper = new VolleyHelper(mContext);
         addressTxt = (TextView) v.findViewById(R.id.address_txt);
-        noMoreCardsTxt = (TextView) v.findViewById(R.id.no_more_cards_txt);
-        cartNumTxt = (TextView) v.findViewById(R.id.cart_num_txt);
-        serviceListIcon = (ImageView) v.findViewById(R.id.list_icon);
-        mapIcon = (ImageView) v.findViewById(R.id.map_icon);
-        cartIcon = (ImageView) v.findViewById(R.id.cart_icon);
         progressBar = (ProgressBar) v.findViewById(R.id.pBar);
         Toolbar toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         preferenceManager = new PreferenceManager(mContext);
-        permissionStatus = mContext.getSharedPreferences("permissionStatus", MODE_PRIVATE);
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
-            if (Utils.isGPSEnabled(mContext)) {
-                getLocation();
-            } else {
-                buildAlertMessageNoGps(mContext);
-            }
-        } else {
-            checkForPermissions();
-        }
+
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
 
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("MobileNo", "9999999999");
-            jsonObject.put("SettlerId", "Str100");
-            jsonObject.put("UserId", "Test100");
-            jsonObject.put("UserLatitude", "19.286812");
-            jsonObject.put("UserLongitude", "72.874334");
+
+        //   cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
+        //   cardStack.setVisibility(View.GONE);
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        volleyHelper.getStoresList(jsonObject);
-        cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
-        cardStack.setVisibility(View.GONE);
-
-        serviceListIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mapFragment.getView().setVisibility(View.GONE);
-                cardStack.setVisibility(View.VISIBLE);
-
-
-            }
-        });
-
-        mapIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cardStack.setVisibility(View.GONE);
-                mapFragment.getView().setVisibility(View.VISIBLE);
-
-            }
-        });
-        cartIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                CartFragment cartFragment = new CartFragment();
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.add(R.id.layout_frame_content, cartFragment);
-                ((BaseActivity) mContext).addFragmentToStack(cartFragment);
-                fragmentTransaction.commit();
-            }
-        });
-        cardStack.setEventCallback(new SwipeDeck.SwipeEventCallback() {
-            @Override
-            public void cardSwipedLeft(int position) {
-                Log.i("MainActivity", "card was swiped left, position in adapter: " + position);
-            }
-
-            @Override
-            public void cardSwipedRight(int position) {
-                Log.i("MainActivity", "card was swiped right, position in adapter: " + position);
-                cartModelList.add(mapsStoreModel.get(position));
-                Log.d("CART SIZE: ", cartModelList.size() + "");
-                cartNumTxt.setText(cartModelList.size() + "");
-                UImsgs.showToast(mContext, R.string.offer_add_to_cart);
-                SettlerSingleton.getInstance().setCartModelList(cartModelList);
-            }
-
-            @Override
-            public void cardsDepleted() {
-                Log.i("MainActivity", "no more cards");
-                noMoreCardsTxt.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void cardActionDown() {
-
-            }
-
-            @Override
-            public void cardActionUp() {
-
-            }
-        });
         return v;
     }
 
@@ -359,6 +175,11 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         //  googleMapInstance.setMyLocationEnabled(true);
 
         //  locateUserAddress(Double.parseDouble(userLati), Double.parseDouble(userLongi));
+        if (preferenceManager.getString("user_lat") != null)
+            userLati = preferenceManager.getString("user_lat");
+        if (preferenceManager.getString("user_long") != null)
+            userLongi = preferenceManager.getString("user_long");
+
         if (googleMapInstance != null && userLati != null) {
             LatLng latLong = new LatLng(Double.parseDouble(userLati), Double.parseDouble(userLongi));
             CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
@@ -371,6 +192,22 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
                     return false;
                 }
             });
+
+            addressTxt.setText(preferenceManager.getString("user_location"));
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("MobileNo", "9999999999");
+                jsonObject.put("SettlerId", "Str100");
+                jsonObject.put("UserId", "Test100");
+
+                jsonObject.put("UserLatitude", userLati);
+                jsonObject.put("UserLongitude", userLongi);
+
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            volleyHelper.getStoresList(jsonObject);
             googleMapInstance.setMyLocationEnabled(true);
         }
     }
@@ -391,7 +228,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
             addressTxt.setText(currentAddress);
             Log.d("ADREESS ::::: ", currentAddress);
             preferenceManager.putString("user_location", currentAddress);
-            SettlerSingleton.getInstance().setMyCurrentAddress(currentAddress);
+            SettlerSingleton.getInstance().setMyCurrentAddress(preferenceManager.getString("user_location"));
             dismisPbar();
         }
     }
@@ -416,32 +253,43 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
 
     }
 
+    private void locateUserAddress() {
+        LatLng latLong = new LatLng(Double.parseDouble(userLati), Double.parseDouble(userLongi));
+        CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
+        googleMapInstance.animateCamera(yourLocation);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(MapStoresHomeEvent event) {
         if (event.success) {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             mapsStoreModel = event.mapsStoreModel;
-            for (int i = 0; i < event.mapsStoreModel.size(); i++) {
-                MapStoresModel servicesMapBaseModel = event.mapsStoreModel.get(i);
-                //the include method will calculate the min and max bound.
-                builder.include(createMarker(Double.parseDouble(servicesMapBaseModel.getStoreLatitude()),
-                        Double.parseDouble(servicesMapBaseModel.getStoreLongitude()), servicesMapBaseModel.getStorName(), servicesMapBaseModel.getProductName(), getBitmapFromURL(servicesMapBaseModel.getImageUrl()))
-                        .getPosition());break;
+            SettlerSingleton.getInstance().setSetOffersDataModel(mapsStoreModel);
+            //   addressTxt.setText(SettlerSingleton.getInstance().getMyCurrentAddress());
+            if (event.mapsStoreModel.size() > 0) {
+                for (int i = 0; i < event.mapsStoreModel.size(); i++) {
+                    MapStoresModel servicesMapBaseModel = event.mapsStoreModel.get(i);
+                    //the include method will calculate the min and max bound.
+                    builder.include(createMarker(Double.parseDouble(servicesMapBaseModel.getStoreLatitude()),
+                            Double.parseDouble(servicesMapBaseModel.getStoreLongitude()), servicesMapBaseModel.getStorName(), servicesMapBaseModel.getProductName(), getBitmapFromURL(servicesMapBaseModel.getImageUrl()))
+                            .getPosition());
 
+                }
+                LatLngBounds bounds = builder.build();
+
+                int padding = 0; // offset from edges of the map in pixels
+            //    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            //    googleMapInstance.moveCamera(cu);
+             //   googleMapInstance.animateCamera(CameraUpdateFactory.zoomTo(14.5f));
+                //   UImsgs.dismissProgressDialog();
+                progressBar.setVisibility(View.GONE);
+
+                //     CartAdapter allServicesAdapter = new CartAdapter(mContext, event.mapsStoreModel);
+                //     recyclerView.setAdapter(allServicesAdapter);
+            } else {
+                locateUserAddress();
             }
-            LatLngBounds bounds = builder.build();
 
-            int padding = 0; // offset from edges of the map in pixels
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-            googleMapInstance.moveCamera(cu);
-            googleMapInstance.animateCamera(CameraUpdateFactory.zoomTo(14.5f));
-            //   UImsgs.dismissProgressDialog();
-            progressBar.setVisibility(View.GONE);
-
-            //     CartAdapter allServicesAdapter = new CartAdapter(mContext, event.mapsStoreModel);
-            //     recyclerView.setAdapter(allServicesAdapter);
-            SwipeDeckAdapter adapter = new SwipeDeckAdapter(event.mapsStoreModel, mContext);
-            cardStack.setAdapter(adapter);
 
         } else {
             UImsgs.showToast(mContext, event.msg);
@@ -466,7 +314,8 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
             EventBus.getDefault().unregister(this);
     }
 
-    @Override
+
+   /* @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_CONSTANT) {
@@ -503,7 +352,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
                 }
             }
         }
-    }
+    }*/
 
     private void locateUserAddress(Double latitude, Double longitude) {
         LatLng latLong = new LatLng(latitude, longitude);
@@ -511,24 +360,6 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         googleMapInstance.animateCamera(yourLocation);
     }
 
-    private void buildAlertMessageNoGps(final Context mContext) {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-        builder.setMessage("Your GPS seems to be disabled, do you want to enable it?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        //  mContext.startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                        Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
-                        dialog.cancel();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
+
 }
 

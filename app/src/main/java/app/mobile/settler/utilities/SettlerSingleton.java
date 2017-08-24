@@ -15,6 +15,17 @@ public class SettlerSingleton {
     private Double mycurrentLongitude;
     private ArrayList<MapStoresModel> cartModelList;
 
+    public ArrayList<MapStoresModel> getSetOffersDataModel() {
+        return setOffersDataModel;
+    }
+
+    public void setSetOffersDataModel(ArrayList<MapStoresModel> setOffersDataModel) {
+        this.setOffersDataModel = setOffersDataModel;
+    }
+
+    private ArrayList<MapStoresModel> setOffersDataModel;
+
+
     public ArrayList<MapStoresModel> getCartModelList() {
         return cartModelList;
     }

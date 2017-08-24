@@ -9,8 +9,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
 
 import app.mobile.settler.R;
@@ -41,12 +39,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
 
     @Override
     public void onBindViewHolder(ServicesViewHolder holder, final int position) {
-        holder.offerTxt.setText(cartModelList.get(position).getProductName());
+        holder.merchantNameTxt.setText(cartModelList.get(position).getStorName());
         holder.offerNameTxt.setText(cartModelList.get(position).getOfferName());
-        holder.expireTxt.setText(cartModelList.get(position).getActiveHours());
 
-        Glide.with(mContext).load(cartModelList.get(position).getImageUrl())
-                .into(holder.servicesIcon);
+        holder.offerDescTxt.setText(cartModelList.get(position).getOfferDesc());
+        holder.expireTxt.setText("Expires in " + cartModelList.get(position).getActiveHours());
+        holder.uniqueOfferTxt.setText("Offer Code " + cartModelList.get(position).getOTP());
+
+     /*   Glide.with(mContext).load(cartModelList.get(position).getImageUrl())
+                .into(holder.servicesIcon);*/
        /* holder.historyRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,15 +66,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     }
 
     public class ServicesViewHolder extends RecyclerView.ViewHolder {
-        public TextView offerTxt, offerNameTxt, expireTxt;
+        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt;
         public ImageView servicesIcon;
         public RelativeLayout historyRow;
 
         public ServicesViewHolder(View itemView) {
             super(itemView);
-            expireTxt = (TextView) itemView.findViewById(R.id.active_hrs);
-            offerTxt = (TextView) itemView.findViewById(R.id.offer_txt);
+            expireTxt = (TextView) itemView.findViewById(R.id.active_hrs_txt);
+            offerDescTxt = (TextView) itemView.findViewById(R.id.offer_desc_txt);
+            merchantNameTxt = (TextView) itemView.findViewById(R.id.merchant_name_txt);
             offerNameTxt = (TextView) itemView.findViewById(R.id.offer_name_txt);
+            uniqueOfferTxt = (TextView) itemView.findViewById(R.id.uniques_offer_txt);
+
             servicesIcon = (ImageView) itemView.findViewById(R.id.services_icon);
             historyRow = (RelativeLayout) itemView.findViewById(R.id.history_row);
         }

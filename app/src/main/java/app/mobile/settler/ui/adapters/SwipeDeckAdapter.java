@@ -57,10 +57,12 @@ public class SwipeDeckAdapter extends BaseAdapter {
         if (v == null) {
 
             // normally use a viewholder
-            v = inflator.inflate(R.layout.services_row, parent, false);
+            v = inflator.inflate(R.layout.offers_deck_row, parent, false);
         }
+        ((TextView) v.findViewById(R.id.merchant_name_txt)).setText(mapsStoreModel.get(position).getStorName());
         ((TextView) v.findViewById(R.id.offer_name_txt)).setText(mapsStoreModel.get(position).getOfferName());
-        ((TextView) v.findViewById(R.id.active_hrs)).setText(mapsStoreModel.get(position).getActiveHours());
+        ((TextView) v.findViewById(R.id.active_hrs)).setText("Expires in " + mapsStoreModel.get(position).getActiveHours());
+        ((TextView) v.findViewById(R.id.offer_desc_txt)).setText(mapsStoreModel.get(position).getOfferDesc());
 
         ImageView servicesIcon = (ImageView) v.findViewById(R.id.services_icon);
 
