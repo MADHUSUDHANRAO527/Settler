@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -265,9 +266,12 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             mapsStoreModel = event.mapsStoreModel;
             SettlerSingleton.getInstance().setSetOffersDataModel(mapsStoreModel);
-            //   addressTxt.setText(SettlerSingleton.getInstance().getMyCurrentAddress());
             if (event.mapsStoreModel.size() > 0) {
-                for (int i = 0; i < event.mapsStoreModel.size(); i++) {
+
+                new LoadMarkers().execute();
+
+
+                /*for (int i = 0; i < event.mapsStoreModel.size(); i++) {
                     MapStoresModel servicesMapBaseModel = event.mapsStoreModel.get(i);
                     //the include method will calculate the min and max bound.
                     builder.include(createMarker(Double.parseDouble(servicesMapBaseModel.getStoreLatitude()),
@@ -282,7 +286,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
             //    googleMapInstance.moveCamera(cu);
              //   googleMapInstance.animateCamera(CameraUpdateFactory.zoomTo(14.5f));
                 //   UImsgs.dismissProgressDialog();
-                progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);*/
 
                 //     CartAdapter allServicesAdapter = new CartAdapter(mContext, event.mapsStoreModel);
                 //     recyclerView.setAdapter(allServicesAdapter);
@@ -359,7 +363,42 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
         googleMapInstance.animateCamera(yourLocation);
     }
+    public class LoadMarkers extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+            for (int i = 0; i < mapsStoreModel.size(); i++) {
+                MapStoresModel servicesMapBaseModel = mapsStoreModel.get(i);
+                //the include method will calculate the min and max bound.
+                builder.include(createMarker(Double.parseDouble(servicesMapBaseModel.getStoreLatitude()),
+                        Double.parseDouble(servicesMapBaseModel.getStoreLongitude()), servicesMapBaseModel.getStorName(), servicesMapBaseModel.getProductName(), getBitmapFromURL(servicesMapBaseModel.getImageUrl()))
+                        .getPosition());
+
+            }
+            LatLngBounds bounds = builder.build();
+
+            int padding = 0; // offset from edges of the map in pixels
+            //    CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+            //    googleMapInstance.moveCamera(cu);
+            //   googleMapInstance.animateCamera(CameraUpdateFactory.zoomTo(14.5f));
+            //   UImsgs.dismissProgressDialog();
+            progressBar.setVisibility(View.GONE);
+
+        }
+    }
 
 }
 

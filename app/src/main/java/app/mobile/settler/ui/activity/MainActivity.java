@@ -29,6 +29,7 @@ import app.mobile.settler.services.LocationAddress;
 import app.mobile.settler.ui.fragments.CardDeckOfferFragment;
 import app.mobile.settler.ui.fragments.CartFragment;
 import app.mobile.settler.ui.fragments.HomeMapFragment;
+import app.mobile.settler.ui.fragments.SettingsFragment;
 import app.mobile.settler.utilities.PreferenceManager;
 import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
@@ -41,7 +42,7 @@ public class MainActivity extends BaseActivity {
     private boolean locationPermission;
     private SharedPreferences permissionStatus;
     private static final int REQUEST_PERMISSION_SETTING = 101;
-    ImageView serviceListIcon, mapIcon, cartIcon;
+    ImageView serviceListIcon, mapIcon, cartIcon, settingsIcon;
     TextView cartNumTxt;
 
     @Override
@@ -52,7 +53,7 @@ public class MainActivity extends BaseActivity {
         mapIcon = (ImageView) findViewById(R.id.map_icon);
         cartIcon = (ImageView) findViewById(R.id.cart_icon);
         cartNumTxt = (TextView) findViewById(R.id.cart_num_txt);
-
+        settingsIcon = (ImageView) findViewById(R.id.settings_icon);
         preferenceManager = new PreferenceManager(this);
         permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
@@ -76,6 +77,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 replaceFragment(new HomeMapFragment());
+
+            }
+        });
+        settingsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new SettingsFragment());
 
             }
         });
