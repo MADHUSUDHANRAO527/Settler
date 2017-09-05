@@ -43,7 +43,7 @@
             android:layout_width="@dimen/icon_size_28"
             android:layout_height="@dimen/icon_size_28"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="@dimen/margin_10"
+            android:layout_marginEnd="@dimen/margin_16"
             android:src="@drawable/ic_shopping_cart" />
 
         <TextView
@@ -52,9 +52,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignTop="@+id/cart_icon"
-            android:textSize="@dimen/margin_16"
             android:layout_marginEnd="@dimen/margin_4"
-            android:textColor="@color/bel_red_text"
+            android:textColor="@color/red"
+            android:textSize="@dimen/margin_16"
             android:textStyle="bold" />
 
     </RelativeLayout>

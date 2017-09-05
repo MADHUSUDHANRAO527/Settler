@@ -39,7 +39,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
 
     @Override
     public void onBindViewHolder(ServicesViewHolder holder, final int position) {
-        holder.merchantNameTxt.setText(cartModelList.get(position).getStorName());
+        holder.merchantNameTxt.setText(cartModelList.get(position).getMerchantName());
         holder.offerNameTxt.setText(cartModelList.get(position).getOfferName());
 
         holder.offerDescTxt.setText(cartModelList.get(position).getOfferDesc());

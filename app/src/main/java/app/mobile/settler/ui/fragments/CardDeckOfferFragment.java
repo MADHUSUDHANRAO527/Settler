@@ -7,15 +7,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daprlabs.cardstack.SwipeDeck;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 
 import app.mobile.settler.R;
+import app.mobile.settler.events.AddToCartEvent;
 import app.mobile.settler.models.MapStoresModel;
-import app.mobile.settler.ui.activity.MainActivity;
+import app.mobile.settler.netwrokHelpers.VolleyHelper;
 import app.mobile.settler.ui.adapters.SwipeDeckAdapter;
 import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
@@ -29,6 +35,9 @@ public class CardDeckOfferFragment extends Fragment {
     SwipeDeck cardStack;
     TextView noMoreCardsTxt, cartNumTxt;
     ArrayList<MapStoresModel> cartModelList = new ArrayList<>();
+    ImageView declineOfferImage, acceptCartImg;
+    int globalPos;
+    private VolleyHelper volleyHelper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +47,10 @@ public class CardDeckOfferFragment extends Fragment {
         mContext = getActivity();
         cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
         noMoreCardsTxt = (TextView) v.findViewById(R.id.no_more_cards_txt);
+        declineOfferImage = (ImageView) v.findViewById(R.id.close_icon);
+        acceptCartImg = (ImageView) v.findViewById(R.id.accept_icon);
+        volleyHelper = new VolleyHelper(mContext);
+
         SwipeDeckAdapter adapter = new SwipeDeckAdapter(SettlerSingleton.getInstance().getSetOffersDataModel(), mContext);
         cardStack.setAdapter(adapter);
 
@@ -45,16 +58,20 @@ public class CardDeckOfferFragment extends Fragment {
             @Override
             public void cardSwipedLeft(int position) {
                 Log.i("MainActivity", "card was swiped left, position in adapter: " + position);
+                globalPos = position;
             }
 
             @Override
             public void cardSwipedRight(int position) {
                 Log.i("MainActivity", "card was swiped right, position in adapter: " + position);
-                cartModelList.add(SettlerSingleton.getInstance().getSetOffersDataModel().get(position));
+                globalPos = position;
+                volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
+                //cartModelList.add(SettlerSingleton.getInstance().getSetOffersDataModel().get(position));
                 Log.d("CART SIZE: ", SettlerSingleton.getInstance().getSetOffersDataModel().size() + "");
                 UImsgs.showToast(mContext, R.string.offer_add_to_cart);
-                SettlerSingleton.getInstance().setCartModelList(cartModelList);
-                ((MainActivity)mContext).setCartNumTxt();
+                // SettlerSingleton.getInstance().setCartModelList(cartModelList);
+                //  ((MainActivity) mContext).setCartNumTxt();
+                callCartListAPI();
 
             }
 
@@ -74,6 +91,57 @@ public class CardDeckOfferFragment extends Fragment {
 
             }
         });
+
+        declineOfferImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cardStack.swipeTopCardLeft(globalPos);
+                //  volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
+            }
+        });
+        acceptCartImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (SettlerSingleton.getInstance().getSetOffersDataModel().size() > 0) {
+                    cardStack.swipeTopCardRight(globalPos);
+                    volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
+                    callCartListAPI();
+                } else {
+                    UImsgs.showToast(mContext, R.string.cart_is_empty);
+                }
+
+            }
+        });
+
         return v;
+    }
+
+    public void callCartListAPI() {
+        volleyHelper.getCartList();
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(AddToCartEvent event) {
+        if (event.success) {
+            globalPos = 0;
+            UImsgs.showToast(mContext, R.string.offer_add_to_cart);
+        } else {
+            UImsgs.showToastErrorMessage(mContext, event.errorCode);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
     }
 }

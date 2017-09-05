@@ -103,6 +103,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
 
         mapFragment = (SupportMapFragment) this.getChildFragmentManager().findFragmentById(map);
         mapFragment.getMapAsync(this);
+        volleyHelper.getCartList();
 
 
         //   cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
@@ -363,6 +364,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
         googleMapInstance.animateCamera(yourLocation);
     }
+
     public class LoadMarkers extends AsyncTask<Void, Void, Void> {
 
         @Override

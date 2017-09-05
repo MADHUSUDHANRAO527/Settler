@@ -95,4 +95,6 @@
     <string name="enter_rating">Give some rating!</string>
     <string name="offer_add_to_cart">Offer saved to Basket</string>
     <string name="cart_is_empty">Cart is empty</string>
+    <string name="offer_is_empty">Offers are empty</string>
+
 </resources>

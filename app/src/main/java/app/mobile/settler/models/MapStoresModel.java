@@ -45,6 +45,19 @@ public class MapStoresModel {
     @Expose
     private String storeLongitude;
 
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    public void setMerchantName(String merchantName) {
+        this.merchantName = merchantName;
+    }
+
+    @SerializedName("MerchantName")
+    @Expose
+    private String merchantName;
+
+
     public String getActiveHours() {
         return activeHours;
     }

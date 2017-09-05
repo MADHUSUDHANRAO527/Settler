@@ -23,7 +23,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import app.mobile.settler.R;
+import app.mobile.settler.events.CartListEvent;
+import app.mobile.settler.netwrokHelpers.VolleyHelper;
 import app.mobile.settler.services.CurrentLocationService;
 import app.mobile.settler.services.LocationAddress;
 import app.mobile.settler.ui.fragments.CardDeckOfferFragment;
@@ -44,6 +50,7 @@ public class MainActivity extends BaseActivity {
     private static final int REQUEST_PERMISSION_SETTING = 101;
     ImageView serviceListIcon, mapIcon, cartIcon, settingsIcon;
     TextView cartNumTxt;
+    private VolleyHelper volleyHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +62,8 @@ public class MainActivity extends BaseActivity {
         cartNumTxt = (TextView) findViewById(R.id.cart_num_txt);
         settingsIcon = (ImageView) findViewById(R.id.settings_icon);
         preferenceManager = new PreferenceManager(this);
+        volleyHelper = new VolleyHelper(this);
+
         permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
             if (Utils.isGPSEnabled(this)) {
@@ -90,11 +99,13 @@ public class MainActivity extends BaseActivity {
         cartIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (SettlerSingleton.getInstance().getCartModelList() != null) {
+               /* if (SettlerSingleton.getInstance().getCartModelList() != null) {
                     replaceFragment(new CartFragment());
                 } else {
                     UImsgs.showToast(MainActivity.this, R.string.cart_is_empty);
-                }
+                }*/
+                replaceFragment(new CartFragment());
+
 
             }
         });
@@ -266,13 +277,37 @@ public class MainActivity extends BaseActivity {
         alert.show();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(CartListEvent event) {
+        if (event.success) {
+            setCartNumTxt(event.mapsStoreModel.size());
+        } else {
+            UImsgs.showToast(this, event.msg);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this);
+    }
+
+
     @Override
     public void onBackPressed() {
         // super.onBackPressed();
         onBackpressedd();
     }
 
-    public void setCartNumTxt() {
-        cartNumTxt.setText(SettlerSingleton.getInstance().getCartModelList().size() + "");
+    public void setCartNumTxt(int cartSize) {
+        cartNumTxt.setText(cartSize + "");
     }
 }
