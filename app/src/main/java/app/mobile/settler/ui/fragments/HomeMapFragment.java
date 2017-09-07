@@ -177,10 +177,17 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         //  googleMapInstance.setMyLocationEnabled(true);
 
         //  locateUserAddress(Double.parseDouble(userLati), Double.parseDouble(userLongi));
-        if (preferenceManager.getString("user_lat") != null)
+        if (SettlerSingleton.getInstance().getMycurrentLatitude() == null)
             userLati = preferenceManager.getString("user_lat");
-        if (preferenceManager.getString("user_long") != null)
+        else
+            userLati = SettlerSingleton.getInstance().getMycurrentLatitude() + "";
+
+
+        if (SettlerSingleton.getInstance().getMycurrentLongitude() == null)
             userLongi = preferenceManager.getString("user_long");
+        else
+            userLongi = SettlerSingleton.getInstance().getMycurrentLongitude() + "";
+
 
         if (googleMapInstance != null && userLati != null) {
             LatLng latLong = new LatLng(Double.parseDouble(userLati), Double.parseDouble(userLongi));
@@ -194,8 +201,10 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
                     return false;
                 }
             });
-
-            addressTxt.setText(preferenceManager.getString("user_location"));
+            if (SettlerSingleton.getInstance().getMyCurrentAddress() == null)
+                addressTxt.setText(SettlerSingleton.getInstance().getMyCurrentAddress());
+            else
+                addressTxt.setText(preferenceManager.getString("user_location"));
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject.put("MobileNo", "9999999999");

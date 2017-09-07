@@ -1,6 +1,7 @@
 package app.mobile.settler.ui.adapters;
 
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,9 @@ import java.util.ArrayList;
 
 import app.mobile.settler.R;
 import app.mobile.settler.models.MapStoresModel;
+import app.mobile.settler.ui.activity.BaseActivity;
+import app.mobile.settler.ui.fragments.CartDetailFragment;
+import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
 
 
@@ -24,6 +28,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     private Context mContext;
     private ArrayList<MapStoresModel> cartModelList;
     private UImsgs uImsgs;
+    private MapStoresModel cartModel;
 
     public CartAdapter(Context context, ArrayList<MapStoresModel> model) {
         this.cartModelList = model;
@@ -38,13 +43,66 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     }
 
     @Override
-    public void onBindViewHolder(ServicesViewHolder holder, final int position) {
+    public void onBindViewHolder(final ServicesViewHolder holder, final int position) {
         holder.merchantNameTxt.setText(cartModelList.get(position).getMerchantName());
         holder.offerNameTxt.setText(cartModelList.get(position).getOfferName());
 
         holder.offerDescTxt.setText(cartModelList.get(position).getOfferDesc());
-        holder.expireTxt.setText("Expires in " + cartModelList.get(position).getActiveHours());
+        // holder.expireTxt.setText("Expires in " + cartModelList.get(position).getActiveHours());
         holder.uniqueOfferTxt.setText("Offer Code " + cartModelList.get(position).getOTP());
+
+
+        if (holder.timer != null) {
+            holder.timer.cancel();
+        }
+        long timer = Long.parseLong(String.valueOf(1200000));
+
+        timer = timer * 1000;
+
+        holder.timer = new CountDownTimer(timer, 1000) {
+            public void onTick(long millisUntilFinished) {
+//              holder.expireTxt.setText("" + millisUntilFinished/1000 + " Sec");
+
+
+                int seconds = (int) (millisUntilFinished / 1000) % 60;
+                int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
+                int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
+                String newtime = hours + ":" + minutes + ":" + seconds;
+
+                if (newtime.equals("0:0:0")) {
+                    holder.expireTxt.setText("00:00:00");
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    holder.expireTxt.setText("0" + hours + ":0" + minutes + ":0" + seconds);
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1)) {
+                    holder.expireTxt.setText("0" + hours + ":0" + minutes + ":" + seconds);
+                } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    holder.expireTxt.setText("0" + hours + ":" + minutes + ":0" + seconds);
+                } else if ((String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
+                    holder.expireTxt.setText(hours + ":0" + minutes + ":0" + seconds);
+                } else if (String.valueOf(hours).length() == 1) {
+                    holder.expireTxt.setText("0" + hours + ":" + minutes + ":" + seconds);
+                } else if (String.valueOf(minutes).length() == 1) {
+                    holder.expireTxt.setText(hours + ":0" + minutes + ":" + seconds);
+                } else if (String.valueOf(seconds).length() == 1) {
+                    holder.expireTxt.setText(hours + ":" + minutes + ":0" + seconds);
+                } else {
+                    holder.expireTxt.setText(hours + ":" + minutes + ":" + seconds);
+                }
+
+            }
+
+            public void onFinish() {
+                holder.expireTxt.setText("00:00:00");
+            }
+        }.start();
+        holder.cartRow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SettlerSingleton.getInstance().setMapStoresModel(cartModelList.get(position));
+                ((BaseActivity) mContext).addFragment(new CartDetailFragment());
+            }
+        });
+
 
      /*   Glide.with(mContext).load(cartModelList.get(position).getImageUrl())
                 .into(holder.servicesIcon);*/
@@ -68,7 +126,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     public class ServicesViewHolder extends RecyclerView.ViewHolder {
         public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt;
         public ImageView servicesIcon;
-        public RelativeLayout historyRow;
+        public RelativeLayout cartRow;
+        CountDownTimer timer;
 
         public ServicesViewHolder(View itemView) {
             super(itemView);
@@ -79,7 +138,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
             uniqueOfferTxt = (TextView) itemView.findViewById(R.id.uniques_offer_txt);
 
             servicesIcon = (ImageView) itemView.findViewById(R.id.services_icon);
-            historyRow = (RelativeLayout) itemView.findViewById(R.id.history_row);
+            cartRow = (RelativeLayout) itemView.findViewById(R.id.row);
         }
     }
 }

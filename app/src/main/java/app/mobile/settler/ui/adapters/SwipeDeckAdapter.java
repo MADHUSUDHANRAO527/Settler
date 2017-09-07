@@ -1,12 +1,12 @@
 package app.mobile.settler.ui.adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -25,6 +25,7 @@ public class SwipeDeckAdapter extends BaseAdapter {
     private Context context;
     LayoutInflater inflator;
     public ArrayList<MapStoresModel> mapsStoreModel;
+    TextView offerExpireTxt;
 
     public SwipeDeckAdapter(ArrayList<MapStoresModel> mapStoreModel
             , Context context) {
@@ -52,32 +53,39 @@ public class SwipeDeckAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder holder;
+        if (convertView == null) {
+            convertView = inflator.inflate(R.layout.offers_deck_row, null);
+            holder = new ViewHolder();
+            holder.merchantNameTxt = (TextView) convertView
+                    .findViewById(R.id.merchant_name_txt);
+            holder.offerNameTxt = (TextView) convertView
+                    .findViewById(R.id.offer_name_txt);
 
-        View v = convertView;
-        if (v == null) {
+            holder.offerDescTxt = (TextView) convertView
+                    .findViewById(R.id.offer_desc_txt);
+            holder.offerIcon = (ImageView) convertView
+                    .findViewById(R.id.services_icon);
 
-            // normally use a viewholder
-            v = inflator.inflate(R.layout.offers_deck_row, parent, false);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
-        ((TextView) v.findViewById(R.id.merchant_name_txt)).setText(mapsStoreModel.get(position).getStorName());
-        ((TextView) v.findViewById(R.id.offer_name_txt)).setText(mapsStoreModel.get(position).getOfferName());
-        ((TextView) v.findViewById(R.id.active_hrs)).setText("Expires in " + mapsStoreModel.get(position).getActiveHours());
-        ((TextView) v.findViewById(R.id.offer_desc_txt)).setText(mapsStoreModel.get(position).getOfferDesc());
-
-        ImageView servicesIcon = (ImageView) v.findViewById(R.id.services_icon);
-
+        holder.merchantNameTxt.setText(mapsStoreModel.get(position).getMerchantName());
+        holder.offerNameTxt.setText(mapsStoreModel.get(position).getOfferName());
+        holder.offerDescTxt.setText(mapsStoreModel.get(position).getOfferDesc());
 
         Glide.with(context).load(mapsStoreModel.get(position).getImageUrl())
-                .into(servicesIcon);
+                .into(holder.offerIcon);
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String item = (String) getItem(position);
-                Log.i("MainActivity", item);
-            }
-        });
 
-        return v;
+
+        return convertView;
+    }
+
+    public class ViewHolder {
+        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt;
+        public ImageView offerIcon;
+        public RelativeLayout cartRow;
     }
 }

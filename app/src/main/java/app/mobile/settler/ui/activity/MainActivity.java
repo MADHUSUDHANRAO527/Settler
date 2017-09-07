@@ -149,21 +149,8 @@ public class MainActivity extends BaseActivity {
             editor.putBoolean(Manifest.permission.ACCESS_FINE_LOCATION, true);
             editor.apply();
         } else {
-            //You already have the permission, just go ahead.
-            if (preferenceManager.getString("user_location") != null && !preferenceManager.getString("user_location").equals("")) {
-                //   addressTxt.setText(preferenceManager.getString("user_location"));
-
-                if (preferenceManager.getString("user_lat") != null) {
-                    replaceFragment(new HomeMapFragment());
-
-                    //     userLati = preferenceManager.getString("user_lat");
-                    //    userLongi = preferenceManager.getString("user_long");
-                }
-                // locateUserAddress(Double.parseDouble(userLati), Double.parseDouble(userLongi));
-                // dismisPbar();
-            } else {
-                getLocation();
-            }
+            getLocation();
+         //   replaceFragment(new HomeMapFragment());
         }
     }
 

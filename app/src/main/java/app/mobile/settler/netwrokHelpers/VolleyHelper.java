@@ -28,6 +28,7 @@ import app.mobile.settler.models.MapStoresModel;
 import app.mobile.settler.utilities.Constants;
 import app.mobile.settler.utilities.CustomerServicesApp;
 import app.mobile.settler.utilities.PreferenceManager;
+import app.mobile.settler.utilities.SettlerSingleton;
 
 
 /**
@@ -38,6 +39,7 @@ public class VolleyHelper {
     private static final String TAG = "Volley";
     private Context mContext;
     private PreferenceManager mPreferenceManager;
+    private String userLati, userLongi;
 
     public VolleyHelper(Context context) {
         this.mContext = context;
@@ -45,6 +47,16 @@ public class VolleyHelper {
     }
 
     public void getStoresList(final JSONObject json) {
+        if (SettlerSingleton.getInstance().getMycurrentLatitude() == null)
+            userLati = mPreferenceManager.getString("user_lat");
+        else
+            userLati = SettlerSingleton.getInstance().getMycurrentLatitude() + "";
+
+
+        if (SettlerSingleton.getInstance().getMycurrentLongitude() == null)
+            userLongi = mPreferenceManager.getString("user_long");
+        else
+            userLongi = SettlerSingleton.getInstance().getMycurrentLongitude() + "";
 
         StringRequest jsonObjRequest = new StringRequest(Request.Method.POST,
                 Constants.BASE_URL + Constants.STORES_LIST,
@@ -81,8 +93,8 @@ public class VolleyHelper {
                 params.put("MobileNo", "9999999999");
                 params.put("SettlerId", "Str100");
                 params.put("UserId", "Test100");
-                params.put("UserLatitude", "19.286812");
-                params.put("UserLongitude", "72.874334");
+                params.put("UserLatitude", userLati);
+                params.put("UserLongitude", userLongi);
 
                 return params;
             }
