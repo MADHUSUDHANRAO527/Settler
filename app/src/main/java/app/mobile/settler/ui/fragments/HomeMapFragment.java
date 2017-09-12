@@ -201,7 +201,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
                     return false;
                 }
             });
-            if (SettlerSingleton.getInstance().getMyCurrentAddress() == null)
+            if (SettlerSingleton.getInstance().getMyCurrentAddress() != null)
                 addressTxt.setText(SettlerSingleton.getInstance().getMyCurrentAddress());
             else
                 addressTxt.setText(preferenceManager.getString("user_location"));
@@ -268,6 +268,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         LatLng latLong = new LatLng(Double.parseDouble(userLati), Double.parseDouble(userLongi));
         CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
         googleMapInstance.animateCamera(yourLocation);
+        progressBar.setVisibility(View.GONE);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -372,6 +373,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
         LatLng latLong = new LatLng(latitude, longitude);
         CameraUpdate yourLocation = CameraUpdateFactory.newLatLngZoom(latLong, 15);
         googleMapInstance.animateCamera(yourLocation);
+        progressBar.setVisibility(View.GONE);
     }
 
     public class LoadMarkers extends AsyncTask<Void, Void, Void> {

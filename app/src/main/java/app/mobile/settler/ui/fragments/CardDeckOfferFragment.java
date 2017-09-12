@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.daprlabs.cardstack.SwipeDeck;
@@ -26,6 +27,7 @@ import app.mobile.settler.netwrokHelpers.VolleyHelper;
 import app.mobile.settler.ui.adapters.SwipeDeckAdapter;
 import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
+import app.mobile.settler.utilities.Utils;
 
 /**
  * Created by Madhu on 23/08/17.
@@ -34,12 +36,13 @@ import app.mobile.settler.utilities.UImsgs;
 public class CardDeckOfferFragment extends Fragment {
     private Context mContext;
     SwipeDeck cardStack;
-    TextView noMoreCardsTxt, expireTxt;
+    TextView noMoreCardsTxt, distanceTxt, expireTxt;
     ArrayList<MapStoresModel> cartModelList = new ArrayList<>();
     ImageView declineOfferImage, acceptCartImg;
     int globalPos;
     private VolleyHelper volleyHelper;
     CountDownTimer countDownTimer;
+    RelativeLayout botmLay;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,13 +52,20 @@ public class CardDeckOfferFragment extends Fragment {
         mContext = getActivity();
         cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
         noMoreCardsTxt = (TextView) v.findViewById(R.id.no_more_cards_txt);
+        distanceTxt = (TextView) v.findViewById(R.id.distance_user_txt);
+
         expireTxt = (TextView) v.findViewById(R.id.active_hrs_txt);
         declineOfferImage = (ImageView) v.findViewById(R.id.close_icon);
         acceptCartImg = (ImageView) v.findViewById(R.id.accept_icon);
+        botmLay = (RelativeLayout) v.findViewById(R.id.btm_lay);
         volleyHelper = new VolleyHelper(mContext);
-
-        SwipeDeckAdapter adapter = new SwipeDeckAdapter(SettlerSingleton.getInstance().getSetOffersDataModel(), mContext);
-        cardStack.setAdapter(adapter);
+        if (SettlerSingleton.getInstance().getSetOffersDataModel().size() > 0) {
+            SwipeDeckAdapter adapter = new SwipeDeckAdapter(SettlerSingleton.getInstance().getSetOffersDataModel(), mContext);
+            cardStack.setAdapter(adapter);
+        } else {
+            noMoreCardsTxt.setVisibility(View.VISIBLE);
+            botmLay.setVisibility(View.GONE);
+        }
 
         startTimer();
 
@@ -79,6 +89,9 @@ public class CardDeckOfferFragment extends Fragment {
                 UImsgs.showToast(mContext, R.string.offer_add_to_cart);
                 // SettlerSingleton.getInstance().setCartModelList(cartModelList);
                 //  ((MainActivity) mContext).setCartNumTxt();
+                distanceTxt.setText((Utils.distance(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude(),
+                        Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getStoreLatitude())
+                        , Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getStoreLongitude())))+" km");
                 callCartListAPI();
 
             }
