@@ -12,10 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import app.mobile.settler.R;
 import app.mobile.settler.models.MapStoresModel;
 import app.mobile.settler.ui.activity.BaseActivity;
 import app.mobile.settler.utilities.SettlerSingleton;
+import app.mobile.settler.utilities.Utils;
 
 /**
  * Created by Madhu on 27/08/17.
@@ -24,7 +27,7 @@ import app.mobile.settler.utilities.SettlerSingleton;
 public class CartDetailFragment extends Fragment {
     private Context mContext;
     private MapStoresModel cartModel;
-    public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt;
+    public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt, distanceTxt;
     public ImageView servicesIcon;
     public RelativeLayout cartRow;
     CountDownTimer countDownTimer;
@@ -42,6 +45,8 @@ public class CartDetailFragment extends Fragment {
         merchantNameTxt = (TextView) v.findViewById(R.id.merchant_name_txt);
         offerNameTxt = (TextView) v.findViewById(R.id.offer_name_txt);
         expireTxt = (TextView) v.findViewById(R.id.active_hrs_txt);
+        distanceTxt = (TextView) v.findViewById(R.id.distance_user_txt);
+
         uniqueOfferTxt = (TextView) v.findViewById(R.id.uniques_offer_txt);
         bottomLayout = (LinearLayout) v.findViewById(R.id.bottom_lay);
 
@@ -51,7 +56,7 @@ public class CartDetailFragment extends Fragment {
         offerDescTxt.setText(cartModel.getOfferDesc());
         //  expireTxt.setText("Expires in " + cartModel.getActiveHours());
         uniqueOfferTxt.setText("Offer Code " + cartModel.getOTP());
-
+        calculateDistance();
 
         if (countDownTimer != null) {
             countDownTimer.cancel();
@@ -104,4 +109,15 @@ public class CartDetailFragment extends Fragment {
         });
         return v;
     }
+
+    private void calculateDistance() {
+        LatLng origin = new LatLng(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude());
+        double destLat = Double.parseDouble(cartModel.getStoreLatitude());
+        double destLongi = Double.parseDouble(cartModel.getStoreLatitude());
+        LatLng dest = new LatLng(destLat, destLongi);
+
+        distanceTxt.setText(String.valueOf(Utils.getDistance(origin, dest)));
+
+    }
 }
+

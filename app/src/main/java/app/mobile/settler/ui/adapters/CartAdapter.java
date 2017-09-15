@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 
 import app.mobile.settler.R;
@@ -18,6 +20,7 @@ import app.mobile.settler.ui.activity.BaseActivity;
 import app.mobile.settler.ui.fragments.CartDetailFragment;
 import app.mobile.settler.utilities.SettlerSingleton;
 import app.mobile.settler.utilities.UImsgs;
+import app.mobile.settler.utilities.Utils;
 
 
 /**
@@ -50,6 +53,13 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
         holder.offerDescTxt.setText(cartModelList.get(position).getOfferDesc());
         // holder.expireTxt.setText("Expires in " + cartModelList.get(position).getActiveHours());
         holder.uniqueOfferTxt.setText("Offer Code " + cartModelList.get(position).getOTP());
+        //distance
+        LatLng origin = new LatLng(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude());
+        double destLat = Double.parseDouble(cartModelList.get(position).getStoreLatitude());
+        double destLongi = Double.parseDouble(cartModelList.get(position).getStoreLatitude());
+        LatLng dest = new LatLng(destLat, destLongi);
+
+        holder.distaceTxt.setText(String.valueOf(Utils.getDistance(origin, dest)));
 
 
         if (holder.timer != null) {
@@ -124,7 +134,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     }
 
     public class ServicesViewHolder extends RecyclerView.ViewHolder {
-        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt;
+        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt,distaceTxt;
         public ImageView servicesIcon;
         public RelativeLayout cartRow;
         CountDownTimer timer;
@@ -135,6 +145,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
             offerDescTxt = (TextView) itemView.findViewById(R.id.offer_desc_txt);
             merchantNameTxt = (TextView) itemView.findViewById(R.id.merchant_name_txt);
             offerNameTxt = (TextView) itemView.findViewById(R.id.offer_name_txt);
+            distaceTxt = (TextView) itemView.findViewById(R.id.distance_user_txt);
             uniqueOfferTxt = (TextView) itemView.findViewById(R.id.uniques_offer_txt);
 
             servicesIcon = (ImageView) itemView.findViewById(R.id.services_icon);

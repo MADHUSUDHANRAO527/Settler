@@ -201,6 +201,7 @@ public class HomeMapFragment extends Fragment implements OnMapReadyCallback {
                     return false;
                 }
             });
+            Log.e("ADDRSS", SettlerSingleton.getInstance().getMyCurrentAddress() + "-" + preferenceManager.getString("user_location"));
             if (SettlerSingleton.getInstance().getMyCurrentAddress() != null)
                 addressTxt.setText(SettlerSingleton.getInstance().getMyCurrentAddress());
             else

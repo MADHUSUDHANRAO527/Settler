@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.daprlabs.cardstack.SwipeDeck;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -62,6 +63,7 @@ public class CardDeckOfferFragment extends Fragment {
         if (SettlerSingleton.getInstance().getSetOffersDataModel().size() > 0) {
             SwipeDeckAdapter adapter = new SwipeDeckAdapter(SettlerSingleton.getInstance().getSetOffersDataModel(), mContext);
             cardStack.setAdapter(adapter);
+            calculateDistance(0);
         } else {
             noMoreCardsTxt.setVisibility(View.VISIBLE);
             botmLay.setVisibility(View.GONE);
@@ -89,17 +91,16 @@ public class CardDeckOfferFragment extends Fragment {
                 UImsgs.showToast(mContext, R.string.offer_add_to_cart);
                 // SettlerSingleton.getInstance().setCartModelList(cartModelList);
                 //  ((MainActivity) mContext).setCartNumTxt();
-                distanceTxt.setText((Utils.distance(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude(),
-                        Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getStoreLatitude())
-                        , Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getStoreLongitude())))+" km");
-                callCartListAPI();
 
+                callCartListAPI();
+                calculateDistance(globalPos);
             }
 
             @Override
             public void cardsDepleted() {
                 Log.i("MainActivity", "no more cards");
                 noMoreCardsTxt.setVisibility(View.VISIBLE);
+                botmLay.setVisibility(View.GONE);
             }
 
             @Override
@@ -136,6 +137,16 @@ public class CardDeckOfferFragment extends Fragment {
 
 
         return v;
+    }
+
+    private void calculateDistance(int pos) {
+        LatLng origin = new LatLng(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude());
+        double destLat = Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(pos).getStoreLatitude());
+        double destLongi = Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(pos).getStoreLatitude());
+        LatLng dest = new LatLng(destLat, destLongi);
+
+        distanceTxt.setText(String.valueOf(Utils.getDistance(origin, dest)));
+
     }
 
     public void callCartListAPI() {
