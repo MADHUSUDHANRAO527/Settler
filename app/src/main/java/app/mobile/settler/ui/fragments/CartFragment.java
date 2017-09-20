@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -28,7 +29,7 @@ public class CartFragment extends Fragment {
     private Context mContext;
     RecyclerView cartRecyclerview;
     private VolleyHelper volleyHelper;
-
+    ProgressBar progressBar;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,10 +37,13 @@ public class CartFragment extends Fragment {
         View v = inflater.inflate(R.layout.fargement_cart, container, false);
         mContext = getActivity();
         volleyHelper = new VolleyHelper(mContext);
+        progressBar = (ProgressBar) v.findViewById(R.id.pBar);
 
         cartRecyclerview = (RecyclerView) v.findViewById(R.id.cart_recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
         cartRecyclerview.setLayoutManager(layoutManager);
+        progressBar.setVisibility(View.VISIBLE);
+
         volleyHelper.getCartList();
         return v;
     }
@@ -53,6 +57,8 @@ public class CartFragment extends Fragment {
         } else {
             UImsgs.showToast(mContext, event.msg);
         }
+        progressBar.setVisibility(View.GONE);
+
     }
 
     @Override

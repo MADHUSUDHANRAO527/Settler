@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -21,7 +22,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -51,6 +56,8 @@ public class MainActivity extends BaseActivity {
     ImageView serviceListIcon, mapIcon, cartIcon, settingsIcon;
     TextView cartNumTxt;
     private VolleyHelper volleyHelper;
+    Context mContext;
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,11 +70,13 @@ public class MainActivity extends BaseActivity {
         settingsIcon = (ImageView) findViewById(R.id.settings_icon);
         preferenceManager = new PreferenceManager(this);
         volleyHelper = new VolleyHelper(this);
+        mContext = this;
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.LOLLIPOP) {
             if (Utils.isGPSEnabled(this)) {
-                getLocation();
+                getLocationFromGoogle();
             } else {
                 buildAlertMessageNoGps(this);
             }
@@ -149,7 +158,8 @@ public class MainActivity extends BaseActivity {
             editor.putBoolean(Manifest.permission.ACCESS_FINE_LOCATION, true);
             editor.apply();
         } else {
-            getLocation();
+            getLocationFromGoogle();
+         //   getLocation();
          //   replaceFragment(new HomeMapFragment());
         }
     }
@@ -160,7 +170,7 @@ public class MainActivity extends BaseActivity {
         if (requestCode == ACCESS_FINE_LOCATION_PERMISSION_CONSTANT) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 //The External Storage Write Permission is granted to you... Continue your left job...
-                getLocation();
+                getLocationFromGoogle();
             } else {
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     //Show Information about why you need the permission
@@ -212,7 +222,6 @@ public class MainActivity extends BaseActivity {
             SettlerSingleton.getInstance().setMycurrentLatitude(latitude);
             SettlerSingleton.getInstance().setMycurrentLongitude(longitude);
             LatLng userLocation = new LatLng(latitude, longitude);
-            replaceFragment(new HomeMapFragment());
 
         } else {
           /*  dismisPbar();
@@ -296,5 +305,45 @@ public class MainActivity extends BaseActivity {
 
     public void setCartNumTxt(int cartSize) {
         cartNumTxt.setText(cartSize + "");
+    }
+    public void getLocationFromGoogle() {
+        if (Utils.checkPlayServices(mContext)) {
+            mFusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                // Logic to handle location object
+                                double latitude = location.getLatitude();
+                                double longitude = location.getLongitude();
+                         /*       NServicesSingleton.getInstance().setMycurrentLatitude(latitude);
+                                NServicesSingleton.getInstance().setMycurrentLongitude(longitude);*/
+                                Log.d("LAT: LONG ", latitude + ":" + longitude);
+                                //updating user lat longi in shared pref
+                                preferenceManager.putString("user_lat", String.valueOf(latitude));
+                                preferenceManager.putString("user_long", String.valueOf(longitude));
+
+                                LocationAddress.getAddressFromLocation(latitude, longitude,
+                                        getApplicationContext(), new GeocoderHandler());
+                                SettlerSingleton.getInstance().setMycurrentLatitude(latitude);
+                                SettlerSingleton.getInstance().setMycurrentLongitude(longitude);
+                                LocationAddress.getAddressFromLocation(latitude, longitude,
+                                        getApplicationContext(), new GeocoderHandler());
+
+                                replaceFragment(new HomeMapFragment());
+
+                            }
+                        }
+                    });
+            mFusedLocationClient.getLastLocation().addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e("Location", "onFailure: NOT ABLE FETCH GOOGLE LOCATION");
+                    //getting from GPS
+                    getLocation();
+                }
+            });
+        }
     }
 }

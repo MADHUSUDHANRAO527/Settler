@@ -7,6 +7,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.LocationManager;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DateFormat;
@@ -145,5 +147,13 @@ public class Utils {
 
     public static double rad2deg(double rad) {
         return (rad * 180.0 / Math.PI);
+    }
+    public static boolean checkPlayServices(Context context) {
+        GoogleApiAvailability googleAPI = GoogleApiAvailability.getInstance();
+        int result = googleAPI.isGooglePlayServicesAvailable(context);
+        if (result != ConnectionResult.SUCCESS) {
+            return false;
+        }
+        return true;
     }
 }

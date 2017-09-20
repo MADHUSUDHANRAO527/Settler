@@ -75,7 +75,7 @@
                     android:layout_marginStart="3dp"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_access_time_black"
-                    android:tint="@color/colorAccent" />
+                    android:tint="@color/app_blue"/>
 
                 <TextView
                     android:id="@+id/active_hrs_txt"
@@ -100,7 +100,7 @@
                     android:layout_marginStart="3dp"
                     android:layout_marginTop="4dp"
                     android:src="@drawable/ic_location_on_black"
-                    android:tint="@color/colorAccent" />
+                    android:tint="@color/app_blue" />
 
                 <TextView
                     android:id="@+id/distance_user_txt"
