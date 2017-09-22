@@ -80,10 +80,11 @@ public class CartDetailFragment extends Fragment {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        long timer = Long.parseLong(String.valueOf(1200000));
+       /* long timer = Long.parseLong(String.valueOf(cartModel.getActiveHours()));
 
         timer = timer * 1000;
-
+      */
+        long timer =  SettlerSingleton.getInstance().getCurrentMilliSec();
         countDownTimer = new CountDownTimer(timer, 1000) {
             public void onTick(long millisUntilFinished) {
 //               expireTxt.setText("" + millisUntilFinished/1000 + " Sec");
@@ -255,5 +256,10 @@ public class CartDetailFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        countDownTimer.cancel();
+    }
 }
 

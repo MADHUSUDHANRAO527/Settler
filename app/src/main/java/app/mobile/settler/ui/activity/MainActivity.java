@@ -32,6 +32,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.MalformedURLException;
+
 import app.mobile.settler.R;
 import app.mobile.settler.events.CartListEvent;
 import app.mobile.settler.netwrokHelpers.VolleyHelper;
@@ -159,8 +161,8 @@ public class MainActivity extends BaseActivity {
             editor.apply();
         } else {
             getLocationFromGoogle();
-         //   getLocation();
-         //   replaceFragment(new HomeMapFragment());
+            //   getLocation();
+            //   replaceFragment(new HomeMapFragment());
         }
     }
 
@@ -248,7 +250,15 @@ public class MainActivity extends BaseActivity {
             //  addressTxt.setText(currentAddress);
             Log.d("ADREESS ::::: ", currentAddress);
             preferenceManager.putString("user_location", currentAddress);
-            SettlerSingleton.getInstance().setMyCurrentAddress(currentAddress);
+            if (currentAddress != null || !currentAddress.isEmpty())
+                SettlerSingleton.getInstance().setMyCurrentAddress(currentAddress);
+            else
+                try {
+                    //fetch address from maps api
+                    Utils.getUrl(latitude, longitude);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             //    dismisPbar();
         }
     }
@@ -306,6 +316,7 @@ public class MainActivity extends BaseActivity {
     public void setCartNumTxt(int cartSize) {
         cartNumTxt.setText(cartSize + "");
     }
+
     public void getLocationFromGoogle() {
         if (Utils.checkPlayServices(mContext)) {
             mFusedLocationClient.getLastLocation()
@@ -315,8 +326,8 @@ public class MainActivity extends BaseActivity {
                             // Got last known location. In some rare situations this can be null.
                             if (location != null) {
                                 // Logic to handle location object
-                                double latitude = location.getLatitude();
-                                double longitude = location.getLongitude();
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
                          /*       NServicesSingleton.getInstance().setMycurrentLatitude(latitude);
                                 NServicesSingleton.getInstance().setMycurrentLongitude(longitude);*/
                                 Log.d("LAT: LONG ", latitude + ":" + longitude);

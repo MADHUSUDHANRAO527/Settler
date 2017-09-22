@@ -31,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import app.mobile.settler.R;
 import app.mobile.settler.events.AddToCartEvent;
@@ -78,6 +79,8 @@ public class CardDeckOfferFragment extends Fragment {
             cardStack.setAdapter(adapter);
             try {
                 calculateDistance(0);
+                startTimer(SettlerSingleton.getInstance().getSetOffersDataModel().get(0).getActiveHours());
+
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
@@ -86,7 +89,6 @@ public class CardDeckOfferFragment extends Fragment {
             botmLay.setVisibility(View.GONE);
         }
 
-        startTimer();
 
 
         cardStack.setEventCallback(new SwipeDeck.SwipeEventCallback() {
@@ -99,14 +101,14 @@ public class CardDeckOfferFragment extends Fragment {
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
-                startTimer();
+                startTimer(SettlerSingleton.getInstance().getSetOffersDataModel().get(position).getActiveHours());
             }
 
             @Override
             public void cardSwipedRight(int position) {
                 Log.i("MainActivity", "card was swiped right, position in adapter: " + position);
                 globalPos = position;
-                startTimer();
+                startTimer(SettlerSingleton.getInstance().getSetOffersDataModel().get(position).getActiveHours());
                 volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
                 //cartModelList.add(SettlerSingleton.getInstance().getSetOffersDataModel().get(position));
                 Log.d("CART SIZE: ", SettlerSingleton.getInstance().getSetOffersDataModel().size() + "");
@@ -191,19 +193,19 @@ public class CardDeckOfferFragment extends Fragment {
         }
     }
 
-    public void startTimer() {
+    public void startTimer(String activeHrsInMin) {
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        long timer = Long.parseLong(String.valueOf(120000));
+        //long timer = Long.parseLong(String.valueOf(120000));
+
+        long timer = TimeUnit.MINUTES.toMillis(Integer.parseInt(activeHrsInMin));
 
         timer = timer * 1000;
 
         countDownTimer = new CountDownTimer(timer, 1000) {
             public void onTick(long millisUntilFinished) {
 //               expireTxt.setText("" + millisUntilFinished/1000 + " Sec");
-
-
                 int seconds = (int) (millisUntilFinished / 1000) % 60;
                 int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
                 int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);

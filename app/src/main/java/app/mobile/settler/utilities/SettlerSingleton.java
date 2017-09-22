@@ -14,6 +14,15 @@ public class SettlerSingleton {
     private Double mycurrentLatitude;
     private Double mycurrentLongitude;
     private ArrayList<MapStoresModel> cartModelList;
+    private long currentMilliSec;
+
+    public long getCurrentMilliSec() {
+        return currentMilliSec;
+    }
+
+    public void setCurrentMilliSec(long currentMilliSec) {
+        this.currentMilliSec = currentMilliSec;
+    }
 
     public MapStoresModel getMapStoresModel() {
         return mapStoresModel;

@@ -26,6 +26,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import app.mobile.settler.R;
 import app.mobile.settler.models.MapStoresModel;
@@ -47,6 +48,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     private UImsgs uImsgs;
     private MapStoresModel cartModel;
     String distanceStr, timeStr;
+    private long clickMillisec;
+
     public CartAdapter(Context context, ArrayList<MapStoresModel> model) {
         this.cartModelList = model;
         this.mContext = context;
@@ -67,7 +70,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
 
         holder.offerDescTxt.setText(cartModelList.get(position).getOfferDesc());
         // holder.expireTxt.setText("Expires in " + cartModelList.get(position).getActiveHours());
-        holder.uniqueOfferTxt.setText("Offer Code " + cartModelList.get(position).getOTP());
+        holder.uniqueOfferTxt.setText("Offer Code :" + cartModelList.get(position).getOTP());
         //distance
         LatLng origin = new LatLng(SettlerSingleton.getInstance().getMycurrentLatitude(), SettlerSingleton.getInstance().getMycurrentLongitude());
         double destLat = Double.parseDouble(cartModelList.get(position).getStoreLatitude());
@@ -75,22 +78,21 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
         LatLng dest = new LatLng(destLat, destLongi);
 
         try {
-            getUrl(origin, dest,holder.distaceTxt);
+            getUrl(origin, dest, holder.distaceTxt);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         if (holder.timer != null) {
             holder.timer.cancel();
         }
-        long timer = Long.parseLong(String.valueOf(1200000));
+        long timer = TimeUnit.MINUTES.toMillis(Integer.parseInt(cartModelList.get(position).getActiveHours()));
 
         timer = timer * 1000;
 
         holder.timer = new CountDownTimer(timer, 1000) {
             public void onTick(long millisUntilFinished) {
 //              holder.expireTxt.setText("" + millisUntilFinished/1000 + " Sec");
-
-
+                clickMillisec = millisUntilFinished;
                 int seconds = (int) (millisUntilFinished / 1000) % 60;
                 int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
                 int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
@@ -125,6 +127,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
         holder.cartRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "onClick: " + clickMillisec);
+                SettlerSingleton.getInstance().setCurrentMilliSec(clickMillisec);
                 SettlerSingleton.getInstance().setMapStoresModel(cartModelList.get(position));
                 ((BaseActivity) mContext).addFragment(new CartDetailFragment());
             }
@@ -151,7 +155,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     }
 
     public class ServicesViewHolder extends RecyclerView.ViewHolder {
-        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt,distaceTxt;
+        public TextView offerDescTxt, merchantNameTxt, offerNameTxt, expireTxt, uniqueOfferTxt, distaceTxt;
         public ImageView servicesIcon;
         public CardView cartRow;
         CountDownTimer timer;
@@ -244,6 +248,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
     // Fetches data from url passed
     private class FetchUrl extends AsyncTask<String, Void, String> {
         TextView distanceTxt;
+
         public FetchUrl(TextView distaceTx) {
             distanceTxt = distaceTx;
         }
@@ -272,16 +277,23 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(result);
-                JSONArray array = jsonObject.getJSONArray("routes");
-                JSONObject routes = array.getJSONObject(0);
-                JSONArray legs = routes.getJSONArray("legs");
-                JSONObject steps = legs.getJSONObject(0);
-                JSONObject distance = steps.getJSONObject("distance");
-                JSONObject duration = steps.getJSONObject("duration");
 
-                distanceStr = distance.getString("text");
-                //   timeStr = duration.getString("text");
-                distanceTxt.setText("(" + distanceStr + ")");
+                JSONArray array = jsonObject.getJSONArray("routes");
+                if (array.length() > 0) {
+                    JSONObject routes = array.getJSONObject(0);
+                    JSONArray legs = routes.getJSONArray("legs");
+                    JSONObject steps = legs.getJSONObject(0);
+                    JSONObject distance = steps.getJSONObject("distance");
+                    JSONObject duration = steps.getJSONObject("duration");
+
+                    distanceStr = distance.getString("text");
+                    //   timeStr = duration.getString("text");
+                    distanceTxt.setText("(" + distanceStr + ")");
+                } else if (jsonObject.has("status")) {
+                    if (jsonObject.getString("status").equalsIgnoreCase("ZERO_RESULTS")) {
+                        distanceTxt.setText(" Error ");
+                    }
+                }
                 // timeTxt.setText(timeStr);
             } catch (JSONException e) {
                 e.printStackTrace();

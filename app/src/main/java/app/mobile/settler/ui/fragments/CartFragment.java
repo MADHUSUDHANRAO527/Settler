@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import org.greenrobot.eventbus.EventBus;
@@ -30,6 +31,8 @@ public class CartFragment extends Fragment {
     RecyclerView cartRecyclerview;
     private VolleyHelper volleyHelper;
     ProgressBar progressBar;
+    ImageView cartEmptyImg;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -38,7 +41,7 @@ public class CartFragment extends Fragment {
         mContext = getActivity();
         volleyHelper = new VolleyHelper(mContext);
         progressBar = (ProgressBar) v.findViewById(R.id.pBar);
-
+        cartEmptyImg = (ImageView) v.findViewById(R.id.cart_empty_img);
         cartRecyclerview = (RecyclerView) v.findViewById(R.id.cart_recyclerview);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
         cartRecyclerview.setLayoutManager(layoutManager);
@@ -52,8 +55,12 @@ public class CartFragment extends Fragment {
     public void onMessageEvent(CartListEvent event) {
         if (event.success) {
             ((MainActivity) mContext).setCartNumTxt(event.mapsStoreModel.size());
-            CartAdapter cartAdapter = new CartAdapter(mContext, event.mapsStoreModel);
-            cartRecyclerview.setAdapter(cartAdapter);
+            if (event.mapsStoreModel.size() > 0) {
+                CartAdapter cartAdapter = new CartAdapter(mContext, event.mapsStoreModel);
+                cartRecyclerview.setAdapter(cartAdapter);
+            } else {
+                cartEmptyImg.setVisibility(View.VISIBLE);
+            }
         } else {
             UImsgs.showToast(mContext, event.msg);
         }
