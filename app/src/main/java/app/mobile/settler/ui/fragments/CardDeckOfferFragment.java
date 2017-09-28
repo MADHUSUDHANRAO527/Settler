@@ -4,12 +4,14 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -30,7 +32,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import app.mobile.settler.R;
@@ -58,6 +62,7 @@ public class CardDeckOfferFragment extends Fragment {
     CountDownTimer countDownTimer;
     RelativeLayout botmLay;
     String distanceStr, timeStr;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -68,7 +73,7 @@ public class CardDeckOfferFragment extends Fragment {
         cardStack = (SwipeDeck) v.findViewById(R.id.swipe_deck);
         noMoreCardsTxt = (TextView) v.findViewById(R.id.no_more_cards_txt);
         distanceTxt = (TextView) v.findViewById(R.id.distance_user_txt);
-
+        progressBar = (ProgressBar) v.findViewById(R.id.pBar);
         expireTxt = (TextView) v.findViewById(R.id.active_hrs_txt);
         declineOfferImage = (ImageView) v.findViewById(R.id.close_icon);
         acceptCartImg = (ImageView) v.findViewById(R.id.accept_icon);
@@ -89,15 +94,15 @@ public class CardDeckOfferFragment extends Fragment {
             botmLay.setVisibility(View.GONE);
         }
 
-
-
+       // countDownStart();
         cardStack.setEventCallback(new SwipeDeck.SwipeEventCallback() {
             @Override
             public void cardSwipedLeft(int position) {
                 Log.i("MainActivity", "card was swiped left, position in adapter: " + position);
-                globalPos = position;
+                globalPos = position + 1;
                 try {
-                    calculateDistance(globalPos);
+                    if (SettlerSingleton.getInstance().getSetOffersDataModel().size() > globalPos)
+                        calculateDistance(globalPos);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }
@@ -107,20 +112,23 @@ public class CardDeckOfferFragment extends Fragment {
             @Override
             public void cardSwipedRight(int position) {
                 Log.i("MainActivity", "card was swiped right, position in adapter: " + position);
-                globalPos = position;
-                startTimer(SettlerSingleton.getInstance().getSetOffersDataModel().get(position).getActiveHours());
-                volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
-                //cartModelList.add(SettlerSingleton.getInstance().getSetOffersDataModel().get(position));
-                Log.d("CART SIZE: ", SettlerSingleton.getInstance().getSetOffersDataModel().size() + "");
-                UImsgs.showToast(mContext, R.string.offer_add_to_cart);
-                // SettlerSingleton.getInstance().setCartModelList(cartModelList);
-                //  ((MainActivity) mContext).setCartNumTxt();
+                globalPos = position + 1;
 
-                callCartListAPI();
-                try {
-                    calculateDistance(globalPos);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                if (SettlerSingleton.getInstance().getSetOffersDataModel().size() > globalPos) {
+                    startTimer(SettlerSingleton.getInstance().getSetOffersDataModel().get(position).getActiveHours());
+                    volleyHelper.addToCart(SettlerSingleton.getInstance().getSetOffersDataModel().get(globalPos).getOfferId());
+                    //cartModelList.add(SettlerSingleton.getInstance().getSetOffersDataModel().get(position));
+                    Log.d("CART SIZE: ", SettlerSingleton.getInstance().getSetOffersDataModel().size() + "");
+                    UImsgs.showToast(mContext, R.string.offer_add_to_cart);
+                    // SettlerSingleton.getInstance().setCartModelList(cartModelList);
+                    //  ((MainActivity) mContext).setCartNumTxt();
+
+                    callCartListAPI();
+                    try {
+                        calculateDistance(globalPos);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -173,9 +181,9 @@ public class CardDeckOfferFragment extends Fragment {
         double destLongi = Double.parseDouble(SettlerSingleton.getInstance().getSetOffersDataModel().get(pos).getStoreLongitude());
         LatLng dest = new LatLng(destLat, destLongi);
 
-       // distanceTxt.setText(String.valueOf(Utils.getDistance(origin, dest)));
+        // distanceTxt.setText(String.valueOf(Utils.getDistance(origin, dest)));
 
-        getUrl(origin,dest);
+        getUrl(origin, dest);
     }
 
     public void callCartListAPI() {
@@ -201,16 +209,25 @@ public class CardDeckOfferFragment extends Fragment {
 
         long timer = TimeUnit.MINUTES.toMillis(Integer.parseInt(activeHrsInMin));
 
-        timer = timer * 1000;
+       // timer = timer * 1000;
 
         countDownTimer = new CountDownTimer(timer, 1000) {
             public void onTick(long millisUntilFinished) {
+
+                /*long secondss = millisUntilFinished / 1000;
+                long minutess = secondss / 60;
+                long hourss = minutess / 60;
+                long dayss = hourss / 24;
+                String time = dayss + ":" + hourss % 24 + ":" + minutess % 60 + ":" + secondss % 60;*/
+
+
 //               expireTxt.setText("" + millisUntilFinished/1000 + " Sec");
                 int seconds = (int) (millisUntilFinished / 1000) % 60;
                 int minutes = (int) ((millisUntilFinished / (1000 * 60)) % 60);
                 int hours = (int) ((millisUntilFinished / (1000 * 60 * 60)) % 24);
-                String newtime = hours + ":" + minutes + ":" + seconds;
-
+                long days = hours / 24;
+                String newtime = days + "D " + hours + "H " + minutes + "M " + seconds;
+                Log.d("Time: ", newtime);
                 if (newtime.equals("0:0:0")) {
                     expireTxt.setText("00:00:00");
                 } else if ((String.valueOf(hours).length() == 1) && (String.valueOf(minutes).length() == 1) && (String.valueOf(seconds).length() == 1)) {
@@ -239,6 +256,7 @@ public class CardDeckOfferFragment extends Fragment {
         }.start();
 
     }
+
     public String getUrl(LatLng origin, LatLng dest) throws MalformedURLException {
 
         // Origin of route
@@ -259,7 +277,7 @@ public class CardDeckOfferFragment extends Fragment {
 
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-        URL distanceUrl = new URL("http://maps.googleapis.com/maps/api/directions/json?origin=" + str_origin + "&destination=" + str_dest + "&sensor=false&units=metric&mode=driving");
+        URL distanceUrl = new URL("http://maps.googleapis.com/maps/api/directions/json?key=" + getResources().getString(R.string.map_key) + "&origin=" + str_origin + "&destination=" + str_dest + "&sensor=false&units=metric&mode=driving");
         //  volleyHelper.calculateDistance(String.valueOf(distanceUrl));
         Log.d(TAG, "Distance getUrl: " + url);
         FetchUrl FetchUrl = new FetchUrl();
@@ -333,26 +351,33 @@ public class CardDeckOfferFragment extends Fragment {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-           // ParserTask parserTask = new ParserTask();
+            // ParserTask parserTask = new ParserTask();
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(result);
-                JSONArray array = jsonObject.getJSONArray("routes");
-                JSONObject routes = array.getJSONObject(0);
-                JSONArray legs = routes.getJSONArray("legs");
-                JSONObject steps = legs.getJSONObject(0);
-                JSONObject distance = steps.getJSONObject("distance");
-                JSONObject duration = steps.getJSONObject("duration");
 
-                distanceStr = distance.getString("text");
-                timeStr = duration.getString("text");
-                distanceTxt.setText("(" + distanceStr + ")");
-               // timeTxt.setText(timeStr);
+                JSONArray array = jsonObject.getJSONArray("routes");
+                if (array.length() > 0) {
+                    JSONObject routes = array.getJSONObject(0);
+                    JSONArray legs = routes.getJSONArray("legs");
+                    JSONObject steps = legs.getJSONObject(0);
+                    JSONObject distance = steps.getJSONObject("distance");
+                    JSONObject duration = steps.getJSONObject("duration");
+
+                    distanceStr = distance.getString("text");
+                    //   timeStr = duration.getString("text");
+                    distanceTxt.setText("(" + distanceStr + ")");
+                } else if (jsonObject.has("status")) {
+                    if (jsonObject.getString("status").equalsIgnoreCase("ZERO_RESULTS")) {
+                        distanceTxt.setText(" No results found ");
+                    }
+                }
+                // timeTxt.setText(timeStr);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-
+            progressBar.setVisibility(View.GONE);
             // Invokes the thread for parsing the JSON data
 
         }
@@ -370,5 +395,51 @@ public class CardDeckOfferFragment extends Fragment {
         super.onStop();
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
+    }
+
+    public void countDownStart() {
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, 1000);
+                try {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat(
+                            "yyyy-MM-dd");
+                    // Here Set your Event Date
+                    Date eventDate = dateFormat.parse("2017-12-30");
+                    Date currentDate = new Date();
+                    if (!currentDate.after(eventDate)) {
+                        long diff = eventDate.getTime()
+                                - currentDate.getTime();
+                        long days = diff / (24 * 60 * 60 * 1000);
+                        diff -= days * (24 * 60 * 60 * 1000);
+                        long hours = diff / (60 * 60 * 1000);
+                        diff -= hours * (60 * 60 * 1000);
+                        long minutes = diff / (60 * 1000);
+                        diff -= minutes * (60 * 1000);
+                        long seconds = diff / 1000;
+
+                        String newtime = String.format("%02d", days) + "D " + String.format("%02d", hours) + "H "
+                                + String.format("%02d", minutes) + "M " + String.format("%02d", seconds);
+                        Log.d("Time: ", newtime);
+
+                        /*tvDay.setText("" + String.format("%02d", days));
+                        tvHour.setText("" + String.format("%02d", hours));
+                        tvMinute.setText("" + String.format("%02d", minutes));
+                        tvSecond.setText("" + String.format("%02d", seconds));*/
+                    } else {
+                      /*  linearLayout1.setVisibility(View.VISIBLE);
+                        linearLayout2.setVisibility(View.GONE);
+                        tvEvent.setText("Android Event Start");*/
+                      //  handler.removeCallbacks(runnable);
+                        // handler.removeMessages(0);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        handler.postDelayed(runnable, 0);
     }
 }

@@ -339,8 +339,7 @@ public class MainActivity extends BaseActivity {
                                         getApplicationContext(), new GeocoderHandler());
                                 SettlerSingleton.getInstance().setMycurrentLatitude(latitude);
                                 SettlerSingleton.getInstance().setMycurrentLongitude(longitude);
-                                LocationAddress.getAddressFromLocation(latitude, longitude,
-                                        getApplicationContext(), new GeocoderHandler());
+
 
                                 replaceFragment(new HomeMapFragment());
 

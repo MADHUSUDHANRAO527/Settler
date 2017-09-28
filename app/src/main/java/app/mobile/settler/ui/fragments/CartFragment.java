@@ -3,6 +3,7 @@ package app.mobile.settler.ui.fragments;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -32,7 +33,7 @@ public class CartFragment extends Fragment {
     private VolleyHelper volleyHelper;
     ProgressBar progressBar;
     ImageView cartEmptyImg;
-
+    private SwipeRefreshLayout swiperefresh;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -43,11 +44,19 @@ public class CartFragment extends Fragment {
         progressBar = (ProgressBar) v.findViewById(R.id.pBar);
         cartEmptyImg = (ImageView) v.findViewById(R.id.cart_empty_img);
         cartRecyclerview = (RecyclerView) v.findViewById(R.id.cart_recyclerview);
+        swiperefresh = (SwipeRefreshLayout) v.findViewById(R.id.swiperefresh);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext);
         cartRecyclerview.setLayoutManager(layoutManager);
         progressBar.setVisibility(View.VISIBLE);
 
         volleyHelper.getCartList();
+        swiperefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                volleyHelper.getCartList();
+
+            }
+        });
         return v;
     }
 
@@ -65,7 +74,7 @@ public class CartFragment extends Fragment {
             UImsgs.showToast(mContext, event.msg);
         }
         progressBar.setVisibility(View.GONE);
-
+        swiperefresh.setRefreshing(false);
     }
 
     @Override

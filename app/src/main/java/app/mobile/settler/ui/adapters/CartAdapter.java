@@ -291,7 +291,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.ServicesViewHo
                     distanceTxt.setText("(" + distanceStr + ")");
                 } else if (jsonObject.has("status")) {
                     if (jsonObject.getString("status").equalsIgnoreCase("ZERO_RESULTS")) {
-                        distanceTxt.setText(" Error ");
+                        distanceTxt.setText(" No results found ");
                     }
                 }
                 // timeTxt.setText(timeStr);

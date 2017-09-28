@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Settler</string>
 
+    <string name="map_key">AIzaSyDLXMmXF6587DFFIzVh77r5W9Wm_jWmStM</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

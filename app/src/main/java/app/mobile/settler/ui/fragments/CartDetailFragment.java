@@ -239,16 +239,23 @@ public class CartDetailFragment extends Fragment {
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject(result);
-                JSONArray array = jsonObject.getJSONArray("routes");
-                JSONObject routes = array.getJSONObject(0);
-                JSONArray legs = routes.getJSONArray("legs");
-                JSONObject steps = legs.getJSONObject(0);
-                JSONObject distance = steps.getJSONObject("distance");
-                JSONObject duration = steps.getJSONObject("duration");
 
-                distanceStr = distance.getString("text");
-                //   timeStr = duration.getString("text");
-                distanceTxt.setText("(" + distanceStr + ")");
+                JSONArray array = jsonObject.getJSONArray("routes");
+                if (array.length() > 0) {
+                    JSONObject routes = array.getJSONObject(0);
+                    JSONArray legs = routes.getJSONArray("legs");
+                    JSONObject steps = legs.getJSONObject(0);
+                    JSONObject distance = steps.getJSONObject("distance");
+                    JSONObject duration = steps.getJSONObject("duration");
+
+                    distanceStr = distance.getString("text");
+                    //   timeStr = duration.getString("text");
+                    distanceTxt.setText("(" + distanceStr + ")");
+                } else if (jsonObject.has("status")) {
+                    if (jsonObject.getString("status").equalsIgnoreCase("ZERO_RESULTS")) {
+                        distanceTxt.setText(" No results found ");
+                    }
+                }
                 // timeTxt.setText(timeStr);
             } catch (JSONException e) {
                 e.printStackTrace();
